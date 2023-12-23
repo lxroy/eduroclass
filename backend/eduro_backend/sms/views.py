@@ -1,9 +1,15 @@
 from rest_framework import generics
-from .models import School, Department, TeacherAssignment, Teacher, Course, Student, Class, Attendance, Exam, Result
+from .models import (
+    School, Department, TeacherAssignment,
+    Teacher, Course, Student, Class,
+    Attendance, Exam, Result
+)
 from .serializers import (
-    SchoolSerializer, DepartmentSerializer, TeacherAssignmentSerializer,
-    TeacherSerializer, CourseSerializer, StudentSerializer,
-    ClassSerializer, AttendanceSerializer, ExamSerializer, ResultSerializer
+    SchoolSerializer, DepartmentSerializer,
+    TeacherAssignmentSerializer, TeacherSerializer,
+    CourseSerializer, StudentSerializer,
+    ClassSerializer, AttendanceSerializer,
+    ExamSerializer, ResultSerializer
 )
 
 

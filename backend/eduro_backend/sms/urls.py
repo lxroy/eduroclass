@@ -16,15 +16,11 @@ urlpatterns = [
     path('schools/', SchoolListCreateView.as_view(), name='school-list-create'),
     path('schools/<int:pk>/', SchoolDetailView.as_view(), name='school-detail'),
 
-    path('departments/', DepartmentListCreateView.as_view(),
-         name='department-list-create'),
-    path('departments/<int:pk>/', DepartmentDetailView.as_view(),
-         name='department-detail'),
+    path('departments/', DepartmentListCreateView.as_view(), name='department-list-create'),
+    path('departments/<int:pk>/', DepartmentDetailView.as_view(), name='department-detail'),
 
-    path('teacher-assignments/', TeacherAssignmentListCreateView.as_view(),
-         name='teacher-assignment-list-create'),
-    path('teacher-assignments/<int:pk>/',
-         TeacherAssignmentDetailView.as_view(), name='teacher-assignment-detail'),
+    path('teacher-assignments/', TeacherAssignmentListCreateView.as_view(), name='teacher-assignment-list-create'),
+    path('teacher-assignments/<int:pk>/', TeacherAssignmentDetailView.as_view(), name='teacher-assignment-detail'),
 
     path('teachers/', TeacherListCreateView.as_view(), name='teacher-list-create'),
     path('teachers/<int:pk>/', TeacherDetailView.as_view(), name='teacher-detail'),
@@ -38,10 +34,8 @@ urlpatterns = [
     path('classes/', ClassListCreateView.as_view(), name='class-list-create'),
     path('classes/<int:pk>/', ClassDetailView.as_view(), name='class-detail'),
 
-    path('attendances/', AttendanceListCreateView.as_view(),
-         name='attendance-list-create'),
-    path('attendances/<int:pk>/', AttendanceDetailView.as_view(),
-         name='attendance-detail'),
+    path('attendances/', AttendanceListCreateView.as_view(), name='attendance-list-create'),
+    path('attendances/<int:pk>/', AttendanceDetailView.as_view(), name='attendance-detail'),
 
     path('exams/', ExamListCreateView.as_view(), name='exam-list-create'),
     path('exams/<int:pk>/', ExamDetailView.as_view(), name='exam-detail'),
