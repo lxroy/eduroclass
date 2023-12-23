@@ -1,4 +1,6 @@
-from django.contrib.auth.models import User
+# models.py
+
+from django.contrib.auth.models import BaseUserManager, AbstractUser, Group, Permission
 from django.db import models
 
 
@@ -11,6 +13,16 @@ class SchoolManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
+class School(AbstractUser):
+    objects = SchoolManager()
+
+    is_school = models.BooleanField(default=True)
+
+    SCHOOL_TYPES = [
+        ('public', 'Public'),
+        ('private', 'Private'),
+    ]
     name = models.CharField(max_length=255)
     address = models.TextField()
     school_type = models.CharField(max_length=10, choices=SCHOOL_TYPES)
@@ -20,13 +32,22 @@ class SchoolManager(BaseUserManager):
     principal_email = models.EmailField()
     principal_phone_number = models.CharField(max_length=15)
 
+    # Adding related_name attributes to resolve clash
+    groups = models.ManyToManyField(Group, related_name='school_groups')
+    user_permissions = models.ManyToManyField(
+        Permission, related_name='school_user_permissions'
+    )
+
+    profile_picture = models.ImageField(
+        upload_to='school_profiles/', null=True, blank=True)
+
     def __str__(self):
-        return self.name
+        return self.username
 
 
 class Department(models.Model):
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     description = models.TextField()
     school = models.ForeignKey(School, on_delete=models.CASCADE)
 
@@ -41,21 +62,43 @@ class TeacherAssignment(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.teacher} - {self.course} at {self.school}"
+        return f'{self.teacher} - {self.course}'
 
 
-class Teacher(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+class TeacherManager(BaseUserManager):
+    def create_teacher(self, username, email, password=None, school=None, **extra_fields):
+        if school is None:
+            raise ValueError("A teacher must be associated with a school.")
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email,
+                          is_teacher=True, school=school, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+
+class Teacher(AbstractUser):
+    objects = TeacherManager()
+
+    is_teacher = models.BooleanField(default=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE)
+
+    # Adding related_name attributes to resolve clash
+    groups = models.ManyToManyField(Group, related_name='teacher_groups')
+    user_permissions = models.ManyToManyField(
+        Permission, related_name='teacher_user_permissions'
+    )
+
     profile_picture = models.ImageField(
         upload_to='teacher_profiles/', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return self.username
 
 
 class Course(models.Model):
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=10, unique=True)
+    code = models.CharField(max_length=10)
     description = models.TextField()
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
 
@@ -63,19 +106,39 @@ class Course(models.Model):
         return self.name
 
 
-class Student(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    # Student belongs to a single school
+class StudentManager(BaseUserManager):
+    def create_student(self, username, email, password=None, school=None, **extra_fields):
+        if school is None:
+            raise ValueError("A student must be associated with a school.")
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email,
+                          is_student=True, school=school, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+
+class Student(AbstractUser):
+    objects = StudentManager()
+
+    is_student = models.BooleanField(default=True)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
+
+    # Adding related_name attributes to resolve clash
+    groups = models.ManyToManyField(Group, related_name='student_groups')
+    user_permissions = models.ManyToManyField(
+        Permission, related_name='student_user_permissions'
+    )
+
     profile_picture = models.ImageField(
         upload_to='student_profiles/', null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return self.username
 
 
 class Class(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
     description = models.TextField()
     courses = models.ManyToManyField(Course)
     students = models.ManyToManyField(Student)
@@ -87,12 +150,12 @@ class Class(models.Model):
 class Attendance(models.Model):
     date = models.DateField()
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    is_present = models.BooleanField(default=True)
+    is_present = models.BooleanField()
     class_attended = models.ForeignKey(Class, on_delete=models.CASCADE)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.student} - {self.date} - Class: {self.class_attended}"
+        return f'{self.student} - {self.date}'
 
 
 class Exam(models.Model):
@@ -105,7 +168,7 @@ class Exam(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.course} - {self.date}"
+        return f'{self.course} - {self.date}'
 
 
 class Result(models.Model):
@@ -116,4 +179,4 @@ class Result(models.Model):
     school = models.ForeignKey(School, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.student} - {self.exam} - Score: {self.score}"
+        return f'{self.student} - {self.exam}'

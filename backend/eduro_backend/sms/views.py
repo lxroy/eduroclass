@@ -1,16 +1,6 @@
 from rest_framework import generics
-from .models import (
-    School, Department, TeacherAssignment,
-    Teacher, Course, Student, Class,
-    Attendance, Exam, Result
-)
-from .serializers import (
-    SchoolSerializer, DepartmentSerializer,
-    TeacherAssignmentSerializer, TeacherSerializer,
-    CourseSerializer, StudentSerializer,
-    ClassSerializer, AttendanceSerializer,
-    ExamSerializer, ResultSerializer
-)
+from .models import School, Department, Teacher, Course, Student, Class, Attendance, Exam, Result
+from .serializers import SchoolSerializer, DepartmentSerializer, TeacherSerializer, CourseSerializer, StudentSerializer, ClassSerializer, AttendanceSerializer, ExamSerializer, ResultSerializer
 
 
 class SchoolListCreateView(generics.ListCreateAPIView):
@@ -31,16 +21,6 @@ class DepartmentListCreateView(generics.ListCreateAPIView):
 class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-
-
-class TeacherAssignmentListCreateView(generics.ListCreateAPIView):
-    queryset = TeacherAssignment.objects.all()
-    serializer_class = TeacherAssignmentSerializer
-
-
-class TeacherAssignmentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = TeacherAssignment.objects.all()
-    serializer_class = TeacherAssignmentSerializer
 
 
 class TeacherListCreateView(generics.ListCreateAPIView):
