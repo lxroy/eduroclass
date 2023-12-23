@@ -2,11 +2,14 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-class School(models.Model):
-    SCHOOL_TYPES = [
-        ('public', 'Public'),
-        ('private', 'Private'),
-    ]
+class SchoolManager(BaseUserManager):
+    def create_school(self, username, email, password=None, **extra_fields):
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email,
+                          is_school=True, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
     name = models.CharField(max_length=255)
     address = models.TextField()
