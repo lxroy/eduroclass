@@ -26,11 +26,11 @@ class School(AbstractUser):
     name = models.CharField(max_length=255)
     address = models.TextField()
     school_type = models.CharField(max_length=10, choices=SCHOOL_TYPES)
-    accreditation_status = models.CharField(max_length=50)
     founding_date = models.DateField()
     principal_name = models.CharField(max_length=100)
     principal_email = models.EmailField()
     principal_phone_number = models.CharField(max_length=15)
+    telephone_number = models.CharField(max_length=15, null=True, blank=True)
 
     # Adding related_name attributes to resolve clash
     groups = models.ManyToManyField(Group, related_name='school_groups')

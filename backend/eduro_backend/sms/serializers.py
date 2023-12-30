@@ -5,13 +5,14 @@ from .models import School, Department, Teacher, Course, Student, Class, Attenda
 class SchoolSerializer(serializers.ModelSerializer):
     class Meta:
         model = School
-        fields = '__all__'
+        fields = ['id','name', 'address', 'school_type',
+                  'founding_date', 'principal_name', 'principal_email', 'principal_phone_number', 'telephone_number', 'profile_picture']
 
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
-        fields = '__all__'
+        fields = ['id', 'name', 'code', 'description']
 
 
 class TeacherSerializer(serializers.ModelSerializer):

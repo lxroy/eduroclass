@@ -1,4 +1,5 @@
 from rest_framework import generics
+from django.shortcuts import get_object_or_404
 from .models import School, Department, Teacher, Course, Student, Class, Attendance, Exam, Result
 from .serializers import SchoolSerializer, DepartmentSerializer, TeacherSerializer, CourseSerializer, StudentSerializer, ClassSerializer, AttendanceSerializer, ExamSerializer, ResultSerializer
 
@@ -14,8 +15,20 @@ class SchoolDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class DepartmentListCreateView(generics.ListCreateAPIView):
-    queryset = Department.objects.all()
+    # queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
+    
+    def get_queryset(self):
+        school_pk = self.kwargs.get('pk')
+        get_object_or_404(School,pk=school_pk)
+        queryset = Department.objects.filter(school=school_pk)
+        return queryset
+    
+    def perform_create(self, serializer):
+        # Set the school when creating a new department
+        school_pk = self.kwargs.get('pk')
+        get_object_or_404(School, pk=school_pk)
+        serializer.save(school_id=school_pk)
 
 
 class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
