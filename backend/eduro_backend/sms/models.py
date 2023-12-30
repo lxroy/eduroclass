@@ -1,5 +1,5 @@
 # models.py
-
+from datetime import datetime
 from django.contrib.auth.models import BaseUserManager, AbstractUser, Group, Permission
 from django.db import models
 
@@ -60,9 +60,21 @@ class TeacherAssignment(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
     course = models.ForeignKey('Course', on_delete=models.CASCADE)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
+    date_of_joining = models.DateField(default = datetime.now().date())
+    date_of_leave = models.DateField(null=True, blank=True)
+    active = models.BooleanField(default= True)
+
 
     def __str__(self):
         return f'{self.teacher} - {self.course}'
+    
+    def deactivate(self, dol=datetime.now().date()):
+        if self.active == True:
+            self.active = False
+            self.date_of_leave = dol
+            self.save()
+            return True
+        return False
 
 
 class TeacherManager(BaseUserManager):
@@ -79,6 +91,8 @@ class TeacherManager(BaseUserManager):
 
 class Teacher(AbstractUser):
     objects = TeacherManager()
+    gender_options = [('male', 'Male'), ('female', 'Female'),
+                      ('others', 'Others')]
 
     is_teacher = models.BooleanField(default=True)
     school = models.ForeignKey(School, on_delete=models.CASCADE)
@@ -88,6 +102,10 @@ class Teacher(AbstractUser):
     user_permissions = models.ManyToManyField(
         Permission, related_name='teacher_user_permissions'
     )
+    dob = models.DateField(default=datetime(1980, 1, 1).date())
+    gender = models.CharField(max_length = 10, choices = gender_options, default = gender_options[0][0])
+
+
 
     profile_picture = models.ImageField(
         upload_to='teacher_profiles/', null=True, blank=True)

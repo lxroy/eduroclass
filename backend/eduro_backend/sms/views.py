@@ -25,7 +25,7 @@ class DepartmentListCreateView(generics.ListCreateAPIView):
         return queryset
     
     def perform_create(self, serializer):
-        # Set the school when creating a new department
+        """ Set the school when creating a new department """
         school_pk = self.kwargs.get('pk')
         get_object_or_404(School, pk=school_pk)
         serializer.save(school_id=school_pk)

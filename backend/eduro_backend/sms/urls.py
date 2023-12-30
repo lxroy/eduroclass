@@ -13,12 +13,14 @@ from .views import (
 
 urlpatterns = [
     path('schools/', SchoolListCreateView.as_view(), name='school-list-create'),
+    
     path('school/<int:pk>/departments/', DepartmentListCreateView.as_view(),
          name='department-list-create'),
-    path('departments/<int:pk>/', DepartmentDetailView.as_view(),
-         name='department-detail'),
+    
     path('schools/<int:pk>/', SchoolDetailView.as_view(), name='school-detail'),
 
+    path('departments/<int:pk>/', DepartmentDetailView.as_view(),
+         name='department-detail'),
 
     path('teachers/', TeacherListCreateView.as_view(), name='teacher-list-create'),
     path('teachers/<int:pk>/', TeacherDetailView.as_view(), name='teacher-detail'),
