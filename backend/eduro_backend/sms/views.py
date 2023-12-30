@@ -1,7 +1,9 @@
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from .models import School, Department, Teacher, Course, Student, Class, Attendance, Exam, Result
-from .serializers import SchoolSerializer, DepartmentSerializer, TeacherSerializer, CourseSerializer, StudentSerializer, ClassSerializer, AttendanceSerializer, ExamSerializer, ResultSerializer
+from .serializers import (SchoolSerializer, DepartmentSerializer, TeacherSerializer, CourseSerializer,
+                          StudentSerializer, ClassSerializer, AttendanceSerializer, ExamSerializer,
+                          ResultSerializer, DepartmentDetailedSerializer)
 
 
 class SchoolListCreateView(generics.ListCreateAPIView):
@@ -15,15 +17,14 @@ class SchoolDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class DepartmentListCreateView(generics.ListCreateAPIView):
-    # queryset = Department.objects.all()
     serializer_class = DepartmentSerializer
-    
+
     def get_queryset(self):
         school_pk = self.kwargs.get('pk')
-        get_object_or_404(School,pk=school_pk)
+        get_object_or_404(School, pk=school_pk)
         queryset = Department.objects.filter(school=school_pk)
         return queryset
-    
+
     def perform_create(self, serializer):
         """ Set the school when creating a new department """
         school_pk = self.kwargs.get('pk')
@@ -33,12 +34,19 @@ class DepartmentListCreateView(generics.ListCreateAPIView):
 
 class DepartmentDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Department.objects.all()
-    serializer_class = DepartmentSerializer
+    serializer_class = DepartmentDetailedSerializer
 
 
 class TeacherListCreateView(generics.ListCreateAPIView):
     queryset = Teacher.objects.all()
     serializer_class = TeacherSerializer
+    
+    def get_queryset(self):
+        school_pk = self.kwargs.get("pk")
+        school = get_object_or_404(School, pk = school_pk)
+        queryset = Teacher.assignments.objects.filter(school = school)
+        print(school)
+        return Teacher.objects.all()
 
 
 class TeacherDetailView(generics.RetrieveUpdateDestroyAPIView):

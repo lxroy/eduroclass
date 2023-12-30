@@ -17,6 +17,9 @@ urlpatterns = [
     path('school/<int:pk>/departments/', DepartmentListCreateView.as_view(),
          name='department-list-create'),
     
+    path('school/<int:pk>/teachers/',
+         TeacherListCreateView.as_view(), name='teacher-list-create'),
+    
     path('schools/<int:pk>/', SchoolDetailView.as_view(), name='school-detail'),
 
     path('departments/<int:pk>/', DepartmentDetailView.as_view(),

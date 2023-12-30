@@ -12,6 +12,12 @@ class SchoolSerializer(serializers.ModelSerializer):
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Department
+        fields = ['id', 'name', 'code']
+        
+        
+class DepartmentDetailedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Department
         fields = ['id', 'name', 'code', 'description']
 
 
