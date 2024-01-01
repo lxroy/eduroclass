@@ -12,11 +12,12 @@ fake = Faker()
 
 
 def create_fake_schools(num_schools=10):
+    scl = []
     for i in range(1, num_schools + 1):
         username = f'{fake.name()} school_{i}'
         name = fake.company()
         email = fake.email()
-        School.objects.create(
+        a = School.objects.create(
             username=username,
             email=email,
             name=name,
@@ -26,6 +27,9 @@ def create_fake_schools(num_schools=10):
             principal_phone_number=fake.phone_number(),
             telephone_number=fake.phone_number()
         )
+        # print(a)
+        scl.append(a)
+    return scl
 
 
 def create_fake_departments(school, num_departments=3):
@@ -118,8 +122,7 @@ def create_fake_attendances(student, num_attendances=20):
             date=fake.date_between(start_date='-3m', end_date='today'),
             student=student,
             is_present=random.choice([True, False]),
-            class_attended=random.choice(
-                Class.objects.filter(students=student)),
+            class_attended=random.choice(Class.objects.filter(students=student)),
             school=student.school,
             comments=fake.text() if random.choice([True, False]) else None,
         )
@@ -189,7 +192,11 @@ def get_grade(score):
 
 
 def generate_fake_data():
-    create_fake_schools()
+    schools = create_fake_schools()
+    # print(schools)
+    # return
+    for school in schools:
+        create_fake_departments(school)
     create_fake_exams()
     create_fake_classes()
 
