@@ -27,7 +27,6 @@ def create_fake_schools(num_schools=10):
             principal_phone_number=fake.phone_number(),
             telephone_number=fake.phone_number()
         )
-        # print(a)
         scl.append(a)
     return scl
 
@@ -40,7 +39,7 @@ def create_fake_departments(school, num_departments=3):
             description=fake.text(),
             school=school,
             head_of_department=create_fake_teachers(
-                school=school, num_teachers=1)[0],
+                school=school, num_teachers=5)[0],
         )
         create_fake_teacher_assignments(department)
 
@@ -80,6 +79,7 @@ def create_fake_teacher_assignments(department, num_assignments=3):
         )
         if assignment.active:
             create_fake_students(assignment)
+            
 
 
 def create_fake_courses(department, num_courses=5):
@@ -97,6 +97,7 @@ def create_fake_courses(department, num_courses=5):
 
 
 def create_fake_students(assignment, num_students=10):
+    std = []
     for i in range(num_students):
         student = Student.objects.create(
             username=f"{fake.user_name()}_{i}",
@@ -113,19 +114,35 @@ def create_fake_students(assignment, num_students=10):
                 start_date='today', end_date='+1y') if random.choice([True, False]) else None,
             active=True,
         )
+        std.append(student)
         create_fake_attendances(student)
+    return std
 
 
 def create_fake_attendances(student, num_attendances=20):
+    classes = Class.objects.filter(students=student)
+
     for _ in range(num_attendances):
+        is_present = random.choice([True, False])
+
+        class_attended = None
+        if classes.exists():
+            class_attended = random.choice(classes)
+        else:
+            create_fake_classes(students=[student])
+            classes = Class.objects.filter(students=student)
+            class_attended = random.choice(classes)
+                
+
         Attendance.objects.create(
             date=fake.date_between(start_date='-3m', end_date='today'),
             student=student,
-            is_present=random.choice([True, False]),
-            class_attended=random.choice(Class.objects.filter(students=student)),
+            is_present=is_present,
+            class_attended=class_attended,
             school=student.school,
-            comments=fake.text() if random.choice([True, False]) else None,
+            comments=fake.text() if not is_present else None,
         )
+
 
 
 def create_fake_exams(num_exams=5):
@@ -159,23 +176,32 @@ def create_fake_results(exam, num_results=10):
         )
 
 
-def create_fake_classes(num_classes=5):
+def create_fake_classes(num_classes=5, students = []):
+    cls = []
+    if not students:
+        students = create_fake_students(assignment=assignment, num_students=20)
     for _ in range(num_classes):
         departments = Department.objects.all()
+        # print("IN FAKE CLASSES")
         if departments.exists():
+            # print("DEPARTMENT EXISTS")
             random_department = random.choice(departments)
-            Class.objects.create(
+            assignment = random.choice(TeacherAssignment.objects.filter(department=random_department))
+            courses = create_fake_courses(department=random_department, num_courses=3)
+            a = Class.objects.create(
                 name=fake.word(),
                 description=fake.text(),
-                courses=create_fake_courses(
-                    department=random_department, num_courses=3),
-                students=create_fake_students(assignment=random.choice(
-                    TeacherAssignment.objects.filter(department=random_department)), num_students=20),
                 start_date=fake.date_between(
-                    start_date='-1y', end_date='today'),
+                start_date='-1y', end_date='today'),
                 end_date=fake.date_between(start_date='today', end_date='+1y'),
             )
-
+            # print()
+            a.courses.set(courses)
+            a.students.set(students)
+            # a.save(True)
+            cls.append(a)
+            
+    return cls
 
 
 def get_grade(score):
@@ -193,12 +219,11 @@ def get_grade(score):
 
 def generate_fake_data():
     schools = create_fake_schools()
-    # print(schools)
-    # return
-    for school in schools:
-        create_fake_departments(school)
+    # for school in schools:
+        # create_fake_departments(school)
+    # create_fake_classes()
     create_fake_exams()
-    create_fake_classes()
+    # create_fake_classes()
 
 
 if __name__ == '__main__':

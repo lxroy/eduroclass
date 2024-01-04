@@ -36,7 +36,7 @@ class School(AbstractUser):
     website = models.URLField(blank=True, null=True)
 
     def __str__(self):
-        return self.username
+        return f"{self.pk}"
 
 
 class Department(models.Model):

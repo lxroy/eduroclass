@@ -21,6 +21,7 @@ class DepartmentListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         school_pk = self.kwargs.get('pk')
+        print(school_pk)
         get_object_or_404(School, pk=school_pk)
         queryset = Department.objects.filter(school=school_pk)
         return queryset
